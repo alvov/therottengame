@@ -4,7 +4,7 @@ var $ = function $( selector ){
 		}
 
 		if ( selector ) {
-			this.el = typeof selector === 'string' ? document.querySelectorAll( selector ) : selector;
+			this.el = typeof selector === 'string' ? document.querySelectorAll( selector ) : [selector];
 		}
 	};
 $.extend = function(){
@@ -54,14 +54,9 @@ $.prototype = {
 		return this;
 	},
 	'each': function( callback ){
-		var i,
-			l = this.el.length;
-		if ( l ) {
-			for ( i = 0, l = this.el.length; i < l; i++ ){
-				callback.apply( this.el[i] );
-			}
-		} else {
-			callback.apply( this.el );
+		var i
+		for ( i = 0, l = this.el.length; i < l; i++ ){
+			callback.apply( this.el[i] );
 		}
 	}
 };

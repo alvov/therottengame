@@ -1,16 +1,28 @@
-var	RottenEngine = function( area, params ){
+var	RottenEngine = function( viewport, params ){
 
-	if ( !area ) return;
+	if ( !viewport ) return;
 
-	this.$area = $( area );
-	this.$area.css( $.extend( {
+	this.$viewport = $( viewport );
+	this.$viewport.css( $.extend( {
 		'overflow': 'hidden'
-	}, params.area ) );
+	}, params.viewport ) );
 
 };
 RottenEngine.prototype = {
-	'scene': function( params ){
-		this.$scene = this.$scene || this.$area.append( 'div', { 'id' : 'scene' } );
+	Scene: function( params ){
+		this.scenes = this.scenes || {};
+		this.$scene = this.$viewport.append( 'div', { 'id' : 'scene' } );
 		this.$scene.css( params );
-	}
+	};
+RottenEngine.Scene = function( params ){
+	
+};
+RottenEngine.Scene.prototype = {
+	build: function( objType, params ){
+		if ( !objType || typeof RottenEngine[objType] !== 'function' ) return;
+		return new ( RottenEngine[objType].call( this, params ) );
+	};
+}
+RottenEngine.Player = function( params ){
+	// this.player = 
 }
