@@ -1,28 +1,12 @@
-// var rottenGame = new RottenEngine( '#game', {
-// 		'area': {
-// 			'width': '1000px',
-// 			'height': '600px'
-// 		}
-// 	} );
-
-// var testScene = new rottenGame.Scene( {
-// 		'width': '1000px',
-// 		'height': '600px',
-// 		'background-image': 'url(img/bg.jpg)'
-// 	} );
-// testScene.build( 'Player', {
-// 	'pos': [100,100],
-// 	'size': [60,60]
-// } );
-
-var RottenGame = function(){
-
-};
+var RottenGame = function(){};
 RottenGame.prototype = {
 	start: function(){
 		Crafty.init( 1000, 500 );
 		Crafty.background( 'url(img/bg.jpg)' );
 		Crafty.scene( 'Loading' );
+	},
+	followMouse: function(){
+
 	}
 };
 
@@ -33,8 +17,6 @@ Crafty.c( 'Grid', {
 			h: 16
 		} )
 	},
-
-	// Locate this entity at the given position on the grid
 	at: function( x, y ) {
 		if ( x === undefined && y === undefined ) {
 			return { x: this.x/16, y: this.y/16 }
@@ -44,42 +26,90 @@ Crafty.c( 'Grid', {
 		}
 	}
 } );
+
 Crafty.c( 'Actor', {
 	init: function() {
 		this.requires( '2D, Canvas, Grid' );
 	},
+	getAngleTo: function( targetX, targetY ){
+		return Crafty.math.radToDeg( Math.atan2(
+			( targetY - this._y - this.cache.headOffset.y ), 
+			( targetX - this._x - this.cache.headOffset.x )
+		) );
+	}
 } );
+
 Crafty.c( 'Player', {
 	init: function(){
+		var that = this;
+		this.cache = {
+			headOffset: { x: 17, y: 29 }
+		};
+
 		this
 			.requires( 'Actor, Fourway, Collision, spr_player, SpriteAnimation' )
-			.origin( 17, 29 )
-			.fourway( 2 )
+			.origin( this.cache.headOffset.x, this.cache.headOffset.y )
+			.fourway( 4 )
 			.reel( 'player_moving', 1000, 0, 0, 7 );
-		var that = this;
-		this.bind( 'NewDirection', function( data ){
-			if ( data.x || data.y ) {
-				this.animate( 'player_moving', -1 );
-			} else {
-				this
-					.pauseAnimation()
-					.resetAnimation();
-			}
-		} );
+
+		this
+			.bind( 'NewDirection', function( data ){
+				if ( data.x || data.y ) {
+					this.animate( 'player_moving', -1 );
+				} else {
+					this
+						.pauseAnimation()
+						.resetAnimation();
+				}
+			} )
+			.bind( 'Moved', function( data ){
+				this.followMouse();
+			} );
+	},
+	followMouse: function( mouseX, mouseY ){
+		mouseX = mouseX || this.cache.mouseX;
+		mouseY = mouseY || this.cache.mouseY;
+		if ( undefined === mouseX || undefined === mouseY ) return;
+		this.rotation = this.getAngleTo( mouseX, mouseY );
+		this.cache.mouseX = mouseX;
+		this.cache.mouseY = mouseY;
+	}
+} );
+
+Crafty.c( 'Monster', {
+	init: function(){
+		this.props = {
+			speed: 2,
+			hitDistance: 5,
+			sightRange: 180,
+			damage: 10,
+			health: 100
+		};
+		this.cache = {
+			headOffset: { x: 34, y: 41 }
+		};
+		this
+			.requires( 'AI, Collision, spr_monster, SpriteAnimation' )
+			.origin( this.cache.headOffset.x, this.cache.headOffset.y )
+			.reel( 'monster_moving', 1000, 0, 0, 7 );
+		this.animate( 'monster_moving', -1 );
 	}
 } );
 
 Crafty.scene( 
 	'TestScene', 
 	function(){
+		var that = this;
+		// Crafty.viewport.follow( this.player, 0, 0 );
+		this.monster1 = Crafty.e( 'Monster' ).at( 20, 15 );
+		this.monster2 = Crafty.e( 'Monster' ).at( 30, 15 );
 		this.player = Crafty.e( 'Player' ).at( 10, 10 );
-		Crafty.addEvent( this, Crafty.stage.elem, 'mousemove', function( e ){
-			var angle = Math.atan2(
-				( e.layerY - this.player.y - 29 ), 
-				( e.layerX - this.player.x - 17 )
-			);
-			this.player.rotation = Crafty.math.radToDeg( angle );
-			// console.log(this.player.rotation);
+		Crafty
+			.addEvent( this, Crafty.stage.elem, 'mousemove', function( e ){
+				this.player.followMouse( e.layerX, e.layerY );
+			} );
+		this.player.bind( 'Moved', function( data ){
+			//
 		} );
 	} 
 );
@@ -87,9 +117,12 @@ Crafty.scene(
 Crafty.scene(
 	'Loading', 
 	function(){
-		Crafty.load( ['img/player.png'], function(){
+		Crafty.load( ['img/player.png', 'img/monster.png'], function(){
 			Crafty.sprite( 60, 'img/player.png', {
 				spr_player:  [0, 0]
+			} );
+			Crafty.sprite( 80, 'img/monster.png', {
+				spr_monster: [0, 0]
 			} );
 
 			Crafty.scene( 'TestScene' );
