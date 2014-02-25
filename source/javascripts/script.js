@@ -2,7 +2,7 @@ var RottenGame = function(){};
 RottenGame.prototype = {
 	start: function(){
 		Crafty.init( 1000, 500 );
-		Crafty.background( 'url(img/bg.jpg)' );
+		Crafty.background( 'url(images/bg.jpg)' );
 		Crafty.scene( 'Loading' );
 	},
 	followMouse: function(){
@@ -33,7 +33,7 @@ Crafty.c( 'Actor', {
 	},
 	getAngleTo: function( targetX, targetY ){
 		return Crafty.math.radToDeg( Math.atan2(
-			( targetY - this._y - this.cache.headOffset.y ), 
+			( targetY - this._y - this.cache.headOffset.y ),
 			( targetX - this._x - this.cache.headOffset.x )
 		) );
 	}
@@ -96,8 +96,8 @@ Crafty.c( 'Monster', {
 	}
 } );
 
-Crafty.scene( 
-	'TestScene', 
+Crafty.scene(
+	'TestScene',
 	function(){
 		var that = this;
 		// Crafty.viewport.follow( this.player, 0, 0 );
@@ -111,17 +111,17 @@ Crafty.scene(
 		this.player.bind( 'Moved', function( data ){
 			//
 		} );
-	} 
+	}
 );
 
 Crafty.scene(
-	'Loading', 
+	'Loading',
 	function(){
-		Crafty.load( ['img/player.png', 'img/monster.png'], function(){
-			Crafty.sprite( 60, 'img/player.png', {
+		Crafty.load( ['images/player.png', 'images/monster.png'], function(){
+			Crafty.sprite( 60, 'images/player.png', {
 				spr_player:  [0, 0]
 			} );
-			Crafty.sprite( 80, 'img/monster.png', {
+			Crafty.sprite( 80, 'images/monster.png', {
 				spr_monster: [0, 0]
 			} );
 

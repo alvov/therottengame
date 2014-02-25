@@ -14,8 +14,9 @@ RottenEngine.prototype = {
 		this.$scene = this.$viewport.append( 'div', { 'id' : 'scene' } );
 		this.$scene.css( params );
 	};
+}
 RottenEngine.Scene = function( params ){
-	
+
 };
 RottenEngine.Scene.prototype = {
 	build: function( objType, params ){
@@ -24,5 +25,5 @@ RottenEngine.Scene.prototype = {
 	};
 }
 RottenEngine.Player = function( params ){
-	// this.player = 
+	// this.player =
 }
