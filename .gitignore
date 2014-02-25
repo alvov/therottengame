@@ -1,0 +1,9 @@
+.DS_Store
+.project
+bin/compile.sh
+build/*
+.stgit*
+*.swap
+*.swo
+*.swp
+*~
